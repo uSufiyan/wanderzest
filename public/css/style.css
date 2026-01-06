@@ -15,9 +15,9 @@ body {
   background-color: white;
 }
 
-.fa-compass {
-  color: #fe424d;
-  font-size: xx-large;
+.logoImg {
+  height: 50px;
+  width: 50px;
   margin-left: 20px;
 }
 
