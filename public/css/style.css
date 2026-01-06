@@ -19,6 +19,11 @@ body {
   height: 50px;
   width: 50px;
   margin-left: 20px;
+  margin-top: 10px;
+}
+
+.brand {
+  font-size: large;
 }
 
 .nav-link {
@@ -395,6 +400,17 @@ body {
 
   .taxSwitch {
     display: none;
+  }
+
+  .logoImg {
+    height: 40px;
+    width: 40px;
+    margin-top: 0;
+  }
+
+  .brand {
+    font-size: medium;
+    padding-bottom: 10px;
   }
 }
 
