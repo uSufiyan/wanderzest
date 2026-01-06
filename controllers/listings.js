@@ -3,6 +3,7 @@ const Listing = require("../models/listing");
 const mbxGeocoding = require('@mapbox/mapbox-sdk/services/geocoding');
 const mapToken = process.env.MAP_TOKEN;
 const geocodingClient = mbxGeocoding({ accessToken: mapToken });
+const { cloudinary } = require("../cloudConfig");
 
 module.exports.index = async (req, res) => {
     let { category, destination } = req.query;
@@ -85,16 +86,17 @@ module.exports.createListing = async (req, res, next) => {
     
     const newListing = new Listing(req.body.listing);
     newListing.owner = req.user._id;
-    if (req.file){
-        let url = req.file.path;
-        let filename = req.file.filename;
-        newListing.image = {url, filename};
+    if (req.file) {
+        newListing.image = {
+            url: req.file.path,
+            filename: req.file.filename
+        };
     }
 
     newListing.geometry = response.body.features[0].geometry;
 
     let savedListing = await newListing.save();
-    console.log(savedListing);
+
     req.flash("success", "New Listing Created!");
     res.redirect("/listings");
 };
@@ -130,10 +132,15 @@ module.exports.updateListing = async (req, res) => {
         })
         .send();
     
-    if (typeof req.file !== "undefined"){
-        let url = req.file.path;
-        let filename = req.file.filename;
-        listing.image = {url, filename};
+    if (typeof req.file !== "undefined") {
+        if (listing.image && listing.image.filename) {
+            await cloudinary.uploader.destroy(listing.image.filename);
+        }
+
+        listing.image = {
+            url: req.file.path,
+            filename: req.file.filename
+        };
     }
 
     listing.geometry = response.body.features[0].geometry;
@@ -145,8 +152,14 @@ module.exports.updateListing = async (req, res) => {
 
 module.exports.destroyListing = async (req, res) => {
     let { id } = req.params;
-    let deletedListing = await Listing.findByIdAndDelete(id);
-    console.log(deletedListing);
+    let listing = await Listing.findByIdAndDelete(id);
+    
+    if (listing && listing.image && listing.image.filename) {
+        await cloudinary.uploader.destroy(listing.image.filename);
+    }
+
+    await Listing.findByIdAndDelete(id);
+    
     req.flash("success", "Listing Deleted!");
     res.redirect("/listings");
 };
