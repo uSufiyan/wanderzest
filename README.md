@@ -135,4 +135,4 @@ http://localhost:8080/listings
 
 ## 🌐 Live Demo
 
-   https://wanderzest.onrender.com/listings
+   https://wanderzest.vercel.app/listings
